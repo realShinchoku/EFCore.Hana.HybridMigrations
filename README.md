@@ -35,6 +35,7 @@ Use the package major version that matches your SAP HANA provider major.
 ## Installation
 
 Install the package line that matches your EF Core and SAP HANA provider version.
+The package major version should follow the EF Core and SAP HANA provider major you are targeting.
 
 ```powershell
 dotnet add package EFCore.Hana.HybridMigrations --version 10.*
