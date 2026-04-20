@@ -23,6 +23,7 @@ This is an unofficial community package. It is not affiliated with, sponsored by
 ## Compatibility
 
 Use the package major version that matches your SAP HANA provider major.
+Published package versions follow the pinned `Microsoft.EntityFrameworkCore.Relational` patch version for each supported EF Core line.
 
 | Package version | EF Core | SAP provider |
 | --- | --- | --- |
