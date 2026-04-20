@@ -1,62 +1,106 @@
 # EFCore.Hana.HybridMigrations
 
-Hybrid SAP HANA migrations support for Entity Framework Core.
+[![NuGet](https://img.shields.io/nuget/v/EFCore.Hana.HybridMigrations.svg)](https://www.nuget.org/packages/EFCore.Hana.HybridMigrations)
+[![CI](https://github.com/realShinchoku/EFCore.Hana.HybridMigrations/actions/workflows/ci.yml/badge.svg)](https://github.com/realShinchoku/EFCore.Hana.HybridMigrations/actions/workflows/ci.yml)
+[![Publish](https://github.com/realShinchoku/EFCore.Hana.HybridMigrations/actions/workflows/publish.yml/badge.svg)](https://github.com/realShinchoku/EFCore.Hana.HybridMigrations/actions/workflows/publish.yml)
+[![License](https://img.shields.io/github/license/realShinchoku/EFCore.Hana.HybridMigrations.svg)](LICENSE)
 
-This package replaces selected EF Core migration services for the SAP HANA EF Core provider. It focuses on safer HANA DDL generation for common migration cases that are awkward or risky with provider defaults:
+`EFCore.Hana.HybridMigrations` extends Entity Framework Core migrations for SAP HANA with safer alter-column handling, HANA-friendly migration history SQL, and version-aligned support for the SAP EF Core provider.
 
-- direct HANA DDL for create, add/drop column, rename column/table, and indexes
-- safer alter-column handling with preflight validation
-- recreate-column flow for supported type conversions
-- automatic normal index drop/recreate around column swaps
-- migration history SQL blocks compatible with HANA SQLScript
-- migration database lock support for EF Core 9 and later
+This package is intended for applications that already use `Sap.EntityFrameworkCore.Hana.v*.0` and want more predictable migration behavior for schema changes that are difficult to express safely with default provider SQL generation.
 
 This is an unofficial community package. It is not affiliated with, sponsored by, or endorsed by SAP.
 
-## Package Lines
+## Features
 
-Use the package major version that matches your EF Core and SAP HANA provider major.
+- Safer alter-column SQL generation for SAP HANA
+- Preflight validation for schema changes that may be destructive
+- Recreate-column flow for supported conversions
+- Automatic drop/recreate of regular indexes around column replacement
+- HANA-compatible migration history SQL blocks
+- Migration database lock support for EF Core 9 and later
 
-| Package major | SAP provider package |
-| --- | --- |
-| `6.x` | `Sap.EntityFrameworkCore.Hana.v6.0` |
-| `7.x` | `Sap.EntityFrameworkCore.Hana.v7.0` |
-| `8.x` | `Sap.EntityFrameworkCore.Hana.v8.0` |
-| `9.x` | `Sap.EntityFrameworkCore.Hana.v9.0` |
-| `10.x` | `Sap.EntityFrameworkCore.Hana.v10.0` |
+## Compatibility
+
+Use the package major version that matches your SAP HANA provider major.
+
+| Package version | EF Core | SAP provider |
+| --- | --- | --- |
+| `6.x` | `6.x` | `Sap.EntityFrameworkCore.Hana.v6.0` |
+| `7.x` | `7.x` | `Sap.EntityFrameworkCore.Hana.v7.0` |
+| `8.x` | `8.x` | `Sap.EntityFrameworkCore.Hana.v8.0` |
+| `9.x` | `9.x` | `Sap.EntityFrameworkCore.Hana.v9.0` |
+| `10.x` | `10.x` | `Sap.EntityFrameworkCore.Hana.v10.0` |
+
+## Installation
+
+Install the package line that matches your EF Core and SAP HANA provider version.
+
+```powershell
+dotnet add package EFCore.Hana.HybridMigrations --version 10.*
+```
 
 ## Usage
 
+Register the SAP HANA provider as usual, then enable the hybrid migration services:
+
 ```csharp
+using EFCore.Hana.HybridMigrations;
 using Microsoft.EntityFrameworkCore;
 using Sap.EntityFrameworkCore.Hana;
-using EFCore.Hana.HybridMigrations;
 
-services.AddDbContext<AppDbContext>(builder =>
+services.AddDbContext<AppDbContext>(options =>
 {
-    builder.UseHana(
+    options.UseHana(
         connectionString,
-        options => options.MigrationsHistoryTable("__EFMigrationsHistory"));
+        hana => hana.MigrationsHistoryTable("__EFMigrationsHistory"));
 
-    builder.UseHanaHybridMigrations();
+    options.UseHanaHybridMigrations();
 });
 ```
 
-Use a policy when you need stricter or looser migration behavior:
+You can also provide a policy to control migration behavior:
 
 ```csharp
-builder.UseHanaHybridMigrations(
+options.UseHanaHybridMigrations(
     HanaMigrationPolicy.Default with
     {
         AllowStringShrinkTruncate = false,
         AutoDropRecreateIndexes = true,
-        LockTableName = "__EFMigrationsLock"
+        LockTableName = "__EFMigrationsLock",
+        LockRowId = 1
     });
 ```
 
-## Build And Test
+## Migration Policy
 
-Build/test one provider major:
+`HanaMigrationPolicy` exposes the main safety switches used by the package:
+
+- `AllowStringShrinkTruncate`
+- `BlockOnPrimaryKey`
+- `BlockOnForeignKey`
+- `BlockOnUniqueConstraint`
+- `AutoDropRecreateIndexes`
+- `EnablePreflightValidation`
+- `LockTableName`
+- `LockRowId`
+
+## What This Package Changes
+
+The package replaces selected EF Core migration services used by the SAP HANA provider in order to improve migration generation for common schema changes, especially around `AlterColumn`.
+
+Typical scenarios covered:
+
+- string length changes
+- supported type conversion flows via temporary column replacement
+- index handling during column recreation
+- migration history SQL generation compatible with HANA SQLScript blocks
+
+It does not replace your application model, migrations, or SAP provider configuration. It only changes the migration pipeline behavior used at runtime and design time.
+
+## Development
+
+Run tests for a specific supported provider major:
 
 ```powershell
 dotnet test .\tests\EFCore.Hana.HybridMigrations.Tests\EFCore.Hana.HybridMigrations.Tests.csproj -p:HanaEfCoreMajor=10
@@ -68,64 +112,14 @@ Run the full supported matrix:
 .\scripts\pack-all.ps1
 ```
 
-The build matrix uses:
+Build targets used by the repository:
 
-- `HanaEfCoreMajor=6` and `7`: `net6.0`
-- `HanaEfCoreMajor=8` and `9`: `net8.0`
-- `HanaEfCoreMajor=10`: `net10.0`
-
-The test project sets `RollForward=Major` so older test TFMs can run on newer installed runtimes during local validation.
-
-## GitHub Actions
-
-The repository includes two workflows:
-
-- `.github/workflows/ci.yml` builds and tests the full `6..10` matrix on pull requests.
-- `.github/workflows/publish.yml` runs whenever `main` is updated, publishes every package line `6..10`, and creates git tags automatically.
-
-### Automatic versioning and tags
-
-Every successful push to `main` publishes all supported package lines:
-
-- `6.x` line using `HanaEfCoreMajor=6`
-- `7.x` line using `HanaEfCoreMajor=7`
-- `8.x` line using `HanaEfCoreMajor=8`
-- `9.x` line using `HanaEfCoreMajor=9`
-- `10.x` line using `HanaEfCoreMajor=10`
-
-For each line, the workflow:
-
-- looks for the latest existing tag matching `v<major>.0.*`
-- increments the patch number
-- packs the project with that version
-- pushes the package to nuget.org
-- creates and pushes the matching git tag on the same `main` commit
-
-Examples of tags the workflow creates automatically:
-
-- `v6.0.3`
-- `v7.0.3`
-- `v8.0.3`
-- `v9.0.3`
-- `v10.0.3`
-
-### Trusted publishing setup
-
-Before the publish workflow can push to nuget.org, create a trusted publishing policy on nuget.org with:
-
-- **Repository Owner**: your GitHub owner/org
-- **Repository**: your GitHub repo name
-- **Workflow File**: `publish.yml`
-- **Environment**: `release`
-
-Then create the GitHub environment `release` and add secret:
-
-- `NUGET_USER` = your nuget.org username
-
-The workflow uses `NuGet/login@v1` and `id-token: write`, so no long-lived NuGet API key is required.
+- `HanaEfCoreMajor=6` and `7` -> `net6.0`
+- `HanaEfCoreMajor=8` and `9` -> `net8.0`
+- `HanaEfCoreMajor=10` -> `net10.0`
 
 ## License
 
-This project's source code is MIT licensed.
+This repository is licensed under the [MIT License](LICENSE).
 
-SAP packages such as `Sap.EntityFrameworkCore.Hana.v10.0` and the bundled SAP HANA .NET client assemblies are governed by SAP's own license terms. This repository does not vendor or relicense SAP binaries.
+SAP provider packages and SAP HANA client assemblies remain subject to SAP's own license terms. This repository does not vendor, redistribute, or relicense SAP binaries.
