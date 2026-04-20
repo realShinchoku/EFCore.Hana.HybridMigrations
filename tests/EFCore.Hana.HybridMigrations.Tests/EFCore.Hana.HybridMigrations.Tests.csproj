@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <HanaEfCoreMajor Condition="'$(HanaEfCoreMajor)' == ''">10</HanaEfCoreMajor>
+    <TargetFramework Condition="'$(HanaEfCoreMajor)' == '6'">net6.0</TargetFramework>
+    <TargetFramework Condition="'$(HanaEfCoreMajor)' == '7'">net6.0</TargetFramework>
+    <TargetFramework Condition="'$(HanaEfCoreMajor)' == '8'">net8.0</TargetFramework>
+    <TargetFramework Condition="'$(HanaEfCoreMajor)' == '9'">net8.0</TargetFramework>
+    <TargetFramework Condition="'$(HanaEfCoreMajor)' == '10'">net10.0</TargetFramework>
+    <TargetFramework Condition="'$(TargetFramework)' == ''">net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <RollForward>Major</RollForward>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" PrivateAssets="all" />
+    <PackageReference Include="FluentAssertions" Version="6.12.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\EFCore.Hana.HybridMigrations\EFCore.Hana.HybridMigrations.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

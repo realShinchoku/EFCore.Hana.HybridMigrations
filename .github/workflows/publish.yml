@@ -1,0 +1,111 @@
+name: Publish to NuGet
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        hana_major: [6, 7, 8, 9, 10]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch tags
+        run: git fetch --force --tags
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            6.0.x
+            8.0.x
+            10.0.x
+
+      - name: Resolve version for package line
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MAJOR="${{ matrix.hana_major }}"
+          TAG_ON_COMMIT="$(git tag --points-at "$GITHUB_SHA" "v${MAJOR}.0.*" | sort -V | tail -n1)"
+
+          if [[ -n "$TAG_ON_COMMIT" ]]; then
+            VERSION="${TAG_ON_COMMIT#v}"
+            CREATE_TAG="false"
+          else
+            LATEST_TAG="$(git tag --list "v${MAJOR}.0.*" | sort -V | tail -n1)"
+
+            if [[ -z "$LATEST_TAG" ]]; then
+              VERSION="${MAJOR}.0.0"
+            else
+              PATCH="${LATEST_TAG##*.}"
+              VERSION="${MAJOR}.0.$((PATCH + 1))"
+            fi
+
+            CREATE_TAG="true"
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "create_tag=$CREATE_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Restore
+        run: dotnet restore ./EFCore.Hana.HybridMigrations.slnx -p:HanaEfCoreMajor=${{ matrix.hana_major }}
+
+      - name: Test
+        run: dotnet test ./EFCore.Hana.HybridMigrations.slnx -c Release -p:HanaEfCoreMajor=${{ matrix.hana_major }} --no-restore --nologo
+
+      - name: Pack
+        run: >
+          dotnet pack ./src/EFCore.Hana.HybridMigrations/EFCore.Hana.HybridMigrations.csproj
+          -c Release
+          -p:HanaEfCoreMajor=${{ matrix.hana_major }}
+          -p:PackageVersion=${{ steps.version.outputs.version }}
+          -p:RepositoryUrl=https://github.com/${{ github.repository }}
+          --no-build
+          -o ./artifacts/${{ matrix.hana_major }}
+          --nologo
+
+      - name: NuGet login (OIDC)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push to NuGet
+        run: >
+          dotnet nuget push ./artifacts/${{ matrix.hana_major }}/*.nupkg
+          --api-key ${{ steps.login.outputs.NUGET_API_KEY }}
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+
+      - name: Create tag
+        if: steps.version.outputs.create_tag == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="v${{ steps.version.outputs.version }}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists."
+            exit 0
+          fi
+
+          git tag -a "$TAG" "$GITHUB_SHA" -m "Release $TAG"
+          git push origin "$TAG"

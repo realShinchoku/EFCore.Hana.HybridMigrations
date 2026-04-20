@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/EFCore.Hana.HybridMigrations/EFCore.Hana.HybridMigrations.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/EFCore.Hana.HybridMigrations.Tests/EFCore.Hana.HybridMigrations.Tests.csproj" />
+  </Folder>
+</Solution>

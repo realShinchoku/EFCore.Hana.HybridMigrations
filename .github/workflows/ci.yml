@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        hana_major: [6, 7, 8, 9, 10]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            6.0.x
+            8.0.x
+            10.0.x
+
+      - name: Restore
+        run: dotnet restore ./EFCore.Hana.HybridMigrations.slnx -p:HanaEfCoreMajor=${{ matrix.hana_major }}
+
+      - name: Test
+        run: dotnet test ./EFCore.Hana.HybridMigrations.slnx -c Release -p:HanaEfCoreMajor=${{ matrix.hana_major }} --no-restore --nologo

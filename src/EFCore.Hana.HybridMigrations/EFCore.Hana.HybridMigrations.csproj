@@ -1,0 +1,81 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <HanaEfCoreMajor Condition="'$(HanaEfCoreMajor)' == ''">10</HanaEfCoreMajor>
+    <TargetFramework Condition="'$(HanaEfCoreMajor)' == '6'">net6.0</TargetFramework>
+    <TargetFramework Condition="'$(HanaEfCoreMajor)' == '7'">net6.0</TargetFramework>
+    <TargetFramework Condition="'$(HanaEfCoreMajor)' == '8'">net8.0</TargetFramework>
+    <TargetFramework Condition="'$(HanaEfCoreMajor)' == '9'">net8.0</TargetFramework>
+    <TargetFramework Condition="'$(HanaEfCoreMajor)' == '10'">net10.0</TargetFramework>
+    <TargetFramework Condition="'$(TargetFramework)' == ''">net10.0</TargetFramework>
+
+    <AssemblyName>EFCore.Hana.HybridMigrations</AssemblyName>
+    <RootNamespace>EFCore.Hana.HybridMigrations</RootNamespace>
+    <PackageId>EFCore.Hana.HybridMigrations</PackageId>
+    <VersionPrefix>$(HanaEfCoreMajor).0.0</VersionPrefix>
+    <Version Condition="'$(Version)' == ''">$(VersionPrefix)</Version>
+    <Authors>Apzon</Authors>
+    <Company>Apzon</Company>
+    <Description>Hybrid SAP HANA migrations support for Entity Framework Core, including safer alter-column SQL generation and HANA migration locks.</Description>
+    <PackageTags>efcore;entity-framework-core;sap;hana;migrations</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(HanaEfCoreMajor)' == '6'">
+    <DefineConstants>$(DefineConstants);HANA_EFCORE_6</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(HanaEfCoreMajor)' == '7'">
+    <DefineConstants>$(DefineConstants);HANA_EFCORE_7</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(HanaEfCoreMajor)' == '8'">
+    <DefineConstants>$(DefineConstants);HANA_EFCORE_8</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(HanaEfCoreMajor)' == '9'">
+    <DefineConstants>$(DefineConstants);HANA_EFCORE_9</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(HanaEfCoreMajor)' == '10'">
+    <DefineConstants>$(DefineConstants);HANA_EFCORE_10</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(HanaEfCoreMajor)' == '6'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.36" />
+    <PackageReference Include="Sap.EntityFrameworkCore.Hana.v6.0" Version="2.28.19" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(HanaEfCoreMajor)' == '7'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.20" />
+    <PackageReference Include="Sap.EntityFrameworkCore.Hana.v7.0" Version="2.28.19" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(HanaEfCoreMajor)' == '8'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.26" />
+    <PackageReference Include="Sap.EntityFrameworkCore.Hana.v8.0" Version="2.28.19" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(HanaEfCoreMajor)' == '9'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.15" />
+    <PackageReference Include="Sap.EntityFrameworkCore.Hana.v9.0" Version="2.28.19" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(HanaEfCoreMajor)' == '10'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.6" />
+    <PackageReference Include="Sap.EntityFrameworkCore.Hana.v10.0" Version="2.28.19" />
+  </ItemGroup>
+
+</Project>
