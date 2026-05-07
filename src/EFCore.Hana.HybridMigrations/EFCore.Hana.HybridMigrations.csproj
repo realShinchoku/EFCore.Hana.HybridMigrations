@@ -61,27 +61,27 @@
 
   <ItemGroup Condition="'$(HanaEfCoreMajor)' == '6'">
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfCorePackageVersion)" />
-    <PackageReference Include="Sap.EntityFrameworkCore.Hana.v6.0" Version="2.28.19" />
+    <PackageReference Include="Sap.EntityFrameworkCore.Hana.v6.0" Version="2.28.20" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(HanaEfCoreMajor)' == '7'">
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfCorePackageVersion)" />
-    <PackageReference Include="Sap.EntityFrameworkCore.Hana.v7.0" Version="2.28.19" />
+    <PackageReference Include="Sap.EntityFrameworkCore.Hana.v7.0" Version="2.28.20" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(HanaEfCoreMajor)' == '8'">
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfCorePackageVersion)" />
-    <PackageReference Include="Sap.EntityFrameworkCore.Hana.v8.0" Version="2.28.19" />
+    <PackageReference Include="Sap.EntityFrameworkCore.Hana.v8.0" Version="2.28.20" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(HanaEfCoreMajor)' == '9'">
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfCorePackageVersion)" />
-    <PackageReference Include="Sap.EntityFrameworkCore.Hana.v9.0" Version="2.28.19" />
+    <PackageReference Include="Sap.EntityFrameworkCore.Hana.v9.0" Version="2.28.20" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(HanaEfCoreMajor)' == '10'">
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfCorePackageVersion)" />
-    <PackageReference Include="Sap.EntityFrameworkCore.Hana.v10.0" Version="2.28.19" />
+    <PackageReference Include="Sap.EntityFrameworkCore.Hana.v10.0" Version="2.28.20" />
   </ItemGroup>
 
 </Project>
