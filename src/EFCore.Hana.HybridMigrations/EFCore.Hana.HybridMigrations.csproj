@@ -10,10 +10,10 @@
     <TargetFramework Condition="'$(TargetFramework)' == ''">net10.0</TargetFramework>
     <EfCorePackageVersion Condition="'$(HanaEfCoreMajor)' == '6'">6.0.36</EfCorePackageVersion>
     <EfCorePackageVersion Condition="'$(HanaEfCoreMajor)' == '7'">7.0.20</EfCorePackageVersion>
-    <EfCorePackageVersion Condition="'$(HanaEfCoreMajor)' == '8'">8.0.26</EfCorePackageVersion>
-    <EfCorePackageVersion Condition="'$(HanaEfCoreMajor)' == '9'">9.0.15</EfCorePackageVersion>
-    <EfCorePackageVersion Condition="'$(HanaEfCoreMajor)' == '10'">10.0.7</EfCorePackageVersion>
-    <EfCorePackageVersion Condition="'$(EfCorePackageVersion)' == ''">10.0.7</EfCorePackageVersion>
+    <EfCorePackageVersion Condition="'$(HanaEfCoreMajor)' == '8'">8.0.27</EfCorePackageVersion>
+    <EfCorePackageVersion Condition="'$(HanaEfCoreMajor)' == '9'">9.0.16</EfCorePackageVersion>
+    <EfCorePackageVersion Condition="'$(HanaEfCoreMajor)' == '10'">10.0.8</EfCorePackageVersion>
+    <EfCorePackageVersion Condition="'$(EfCorePackageVersion)' == ''">10.0.8</EfCorePackageVersion>
 
     <AssemblyName>EFCore.Hana.HybridMigrations</AssemblyName>
     <RootNamespace>EFCore.Hana.HybridMigrations</RootNamespace>
